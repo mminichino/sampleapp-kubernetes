@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sampleapp
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+       maxUnavailable: 25%
+       maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: sampleapp
+    spec:
+      containers:
+      - name: sample-app
+        image: mminichino/sample-app:1.2
+        command: ["node", "index-db.js"]
+        ports:
+        - name: nodejs-port
+          containerPort: 8080
+        readinessProbe:
+          httpGet:
+             path: /Netapp_logo.png
+             port: nodejs-port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 15
+        env:
+          - name: MYSQL_HOST
+            value: sampleapp-db-service
+          - name: MYSQL_USER
+            value: root
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlRootPassword
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlDatabase
+          - name: APPVERSION
+            value: "1.2"

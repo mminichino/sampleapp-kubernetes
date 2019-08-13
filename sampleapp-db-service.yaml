@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-db-service
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+  selector:
+    app: sampleapp-db
+  type: NodePort
