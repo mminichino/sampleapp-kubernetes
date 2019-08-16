@@ -12,6 +12,7 @@ $ git clone https://github.com/mminichino/sampleapp-kubernetes
 $ cd sampleapp-kubernetes
 $ tridentctl -n trident create backend -f ontap-nas-trident-sample.json
 $ kubectl create -f storage-class-ontapnas.yaml
+$ kubectl create -f sampleapp-secrets.yaml
 $ kubectl apply -f <(istioctl kube-inject -f sampleapp-stack.yaml)
 $ kubectl create -f sampleapp-istio-gw.yaml
 ```
