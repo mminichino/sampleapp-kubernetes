@@ -63,3 +63,9 @@ $ sudo chmod 555 /usr/local/bin/kubectl
 ```
 
 To install kubectl on Windows, download the installer [here](https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/windows/amd64/kubectl.exe).
+
+Final note - as Windows PowerShell does not support POSIX shell style redirection, the kubectl/istioctl inject command must be done in two steps:
+```
+istioctl kube-inject -f sampleapp-stack-local.yaml > sampleapp-stack-local-inject.yaml
+kubectl create -f sampleapp-stack-local-inject.yaml
+```
