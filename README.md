@@ -20,6 +20,7 @@ $ kubectl create -f sampleapp-istio-gw.yaml
 To run the sample app without Trident, rather with local storage:
 
 ```
+$ kubectl create -f sampleapp-secrets.yaml
 $ kubectl apply -f <(istioctl kube-inject -f sampleapp-stack-local.yaml)
 $ kubectl create -f sampleapp-istio-gw.yaml
 ```
