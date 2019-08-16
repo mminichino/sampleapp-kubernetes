@@ -3,9 +3,10 @@ Kubernetes YAML for the Sample App
 
 To create the sample app with ONTAP NAS storage via Trident:
 
-1) Install Trident per documentation in namespace trident
-2) Edit JSON as appropriate for target ONTAP system
-3) Add Trident and Istio bin directories to PATH
+1) Install kubectl and istioctl (if necessary)
+2) Install Trident per documentation in namespace trident
+3) Edit JSON as appropriate for target ONTAP system
+4) Add Trident and Istio bin directories to PATH
 
 ```
 $ git clone https://github.com/mminichino/sampleapp-kubernetes
@@ -43,4 +44,22 @@ $ curl -L https://git.io/getLatestIstio | ISTIO_VERSION=1.0.0 sh -
 $ export PATH="~/istio-1.0.0/bin:$PATH"
 $ which istioctl
 ```
+The Windows istioctl 1.0.0 installer can be obtained [here](https://github.com/istio/istio/releases/download/1.0.0/istio-1.0.0-win.zip).
 
+To install kubectl on macOS:
+
+```
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
+$ sudo cp kubectl /usr/local/bin
+$ sudo chmod 555 /usr/local/bin/kubectl
+```
+
+To install kubectl on Linux:
+
+```$xslt
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+$ sudo cp kubectl /usr/local/bin
+$ sudo chmod 555 /usr/local/bin/kubectl
+```
+
+To install kubectl on Windows, download the installer [here](https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/windows/amd64/kubectl.exe).
