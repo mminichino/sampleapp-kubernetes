@@ -33,6 +33,6 @@ NAME                   TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)       
 istio-ingressgateway   LoadBalancer   10.100.7.19   <pending>     15020:30698/TCP,80:31380/TCP,443:31390
 ```
 
-In this example the HTTP port is 31380, so you can access the app via http://<master node IP>:31380
+In this example the HTTP port is 31380, so you can access the app via http://\<master node IP\>:31380
 
 
