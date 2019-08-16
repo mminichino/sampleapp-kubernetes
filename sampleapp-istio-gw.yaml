@@ -23,11 +23,8 @@ spec:
   gateways:
   - sampleapp-gateway
   http:
-  - match:
-    - uri:
-        prefix: /
-    route:
+  - route:
     - destination:
-        host: sampleapp.default.svc.cluster.local
+        host: sampleapp-service.default.svc.cluster.local
         port:
           number: 8080
