@@ -8,6 +8,8 @@ To create the sample app with ONTAP NAS storage via Trident:
 3) Add Trident and Istio bin directories to PATH
 
 ```
+$ git clone https://github.com/mminichino/sampleapp-kubernetes
+$ cd sample-app
 $ tridentctl -n trident create backend -f ontap-nas-trident-sample.json
 $ kubectl create -f storage-class-ontapnas.yaml
 $ kubectl apply -f <(istioctl kube-inject -f sampleapp-stack.yaml)
