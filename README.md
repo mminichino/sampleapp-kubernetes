@@ -33,6 +33,14 @@ NAME                   TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)       
 istio-ingressgateway   LoadBalancer   10.100.7.19   <pending>     15020:30698/TCP,80:31380/TCP,443:31390
 ```
 
-In this example the HTTP port is 31380, so you can access the app via http://\<master node IP\>:31380
+In this example the HTTP port is 31380 and the external IP is pending (meaning there is no external IP), so you can access the app via http://\<master node host IP\>:31380.  If an external IP is shown, access the app via http://\<external IP\>:31380.
 
+If you choose to run this on NetApp Kubernetes Service, it is recommended to use the istioctl from the 1.0.0 release.
+
+```
+$ cd ~
+$ curl -L https://git.io/getLatestIstio | ISTIO_VERSION=1.0.0 sh -
+$ export PATH="~/istio-1.0.0/bin:$PATH"
+$ which istioctl
+```
 
