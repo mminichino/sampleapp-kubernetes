@@ -78,11 +78,11 @@ metadata:
   name: sampleapp-db-pv-claim
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 20Gi
-  storageClassName: ontapnas
+  storageClassName: element-bronze
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -110,6 +110,7 @@ spec:
         volumeMounts:
         - name: sampleapp-persistent-storage
           mountPath: /var/lib/mysql
+          subPath: mysql
         env:
           - name: MYSQL_ROOT_PASSWORD
             valueFrom:

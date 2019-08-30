@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sampleapp-config
+  namespace: default
+data:
+  appversion: "2.0"
