@@ -32,7 +32,7 @@ done
 
 if [ $GETVC -eq 1 ]
 then
-   COUNT=$(wget -q http://172.16.1.54:31380/v1/visitors/count -O - | jq .result)
+   COUNT=$(wget -q http://${HOST}:${PORT}/v1/visitors/count -O - | jq .result)
    if [ ! $COUNT -eq $COUNT ]
    then
       echo "Output not properly formatted. Check the host and port and try again."
