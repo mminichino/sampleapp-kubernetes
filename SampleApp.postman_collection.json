@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "106fd6e8-a366-44de-abab-d884cf395315",
+		"name": "SampleApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GetVisitorCount",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"method\":\"GetVisitorCount\",\n\t\"id\":1\n}"
+				},
+				"url": {
+					"raw": "http://{{Hostname}}/v1/visitors/count",
+					"protocol": "http",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"v1",
+						"visitors",
+						"count"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetVisitorList",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"method\":\"GetVisitorList\",\n\t\"order\":\"ascending\",\n\t\"between\":\"\",\n\t\"id\":1\n}"
+				},
+				"url": {
+					"raw": "http://{{Hostname}}/v1/visitors/list",
+					"protocol": "http",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"v1",
+						"visitors",
+						"list"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "fae5e619-9bd2-4290-b432-77a0a3ec8009",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "2ad490a7-8336-4212-a968-5474a9b7abde",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "6bdc3649-2803-4571-877f-d815362b5017",
+			"key": "Hostname",
+			"value": "127.0.0.1:8080",
+			"type": "string"
+		}
+	]
+}
