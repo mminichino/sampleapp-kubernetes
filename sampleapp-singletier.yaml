@@ -1,9 +1,18 @@
-apiVersion: extensions/v1beta1
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: samplemin
+---
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sampleapp-onetier
+  namespace: samplemin
 spec:
   replicas: 4
+  selector:
+    matchLabels:
+      app: sampleapp-onetier
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -16,19 +25,25 @@ spec:
     spec:
       containers:
       - name: sample-app
-        image: mminichino/sample-app:1.1
-        command: ["node", "index.js"]
+        image: mminichino/sample-app:latest
+        command: ["node", "index-static.js"]
         ports:
         - name: nodejs-port
           containerPort: 8080
-        readinessProbe:
-          httpGet:
-             path: /Netapp_logo.png
-             port: nodejs-port
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          successThreshold: 1
-          timeoutSeconds: 15
         env:
           - name: APPVERSION
-            value: "1.1"
+            value: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-onetier-service
+  namespace: samplemin
+spec:
+  ports:
+  - port: 8088
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: sampleapp-onetier

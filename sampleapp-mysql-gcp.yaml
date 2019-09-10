@@ -1,0 +1,79 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sampleapp-db-pv-claim
+  namespace: sampleapp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: standard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sampleapp-db
+  namespace: sampleapp
+spec:
+  selector:
+    matchLabels:
+      app: sampleapp-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: sampleapp-db
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        ports:
+        - name: mysql-port
+          containerPort: 3306
+        volumeMounts:
+        - name: sampleapp-persistent-storage
+          mountPath: /var/lib/mysql
+          subPath: mysql
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlRootPassword
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlUser
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlPassword
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlDatabase
+      volumes:
+      - name: sampleapp-persistent-storage
+        persistentVolumeClaim:
+          claimName: sampleapp-db-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-db-service
+  namespace: sampleapp
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: sampleapp-db

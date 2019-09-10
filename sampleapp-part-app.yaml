@@ -1,9 +1,13 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sampleapp
+  namespace: sampleapp
 spec:
   replicas: 4
+  selector:
+    matchLabels:
+      app: sampleapp
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -11,13 +15,16 @@ spec:
        maxSurge: 1
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp
     spec:
       containers:
       - name: sample-app
-        image: mminichino/sample-app:1.2
-        command: ["node", "index-db.js"]
+        image: mminichino/sample-app:latest
+        imagePullPolicy: Always
+        command: ["node", "index.js"]
         ports:
         - name: nodejs-port
           containerPort: 8080
@@ -37,4 +44,17 @@ spec:
                 name: sampleapp-secrets
                 key: mysqlDatabase
           - name: APPVERSION
-            value: "1.2"
+            valueFrom:
+              configMapKeyRef:
+                name: sampleapp-config
+                key: appversion
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: REDIS_HOST
+            value: sampleapp-redis-service

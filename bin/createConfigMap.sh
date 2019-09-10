@@ -11,7 +11,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sampleapp-config
-  namespace: default
+  namespace: sampleapp
 data:
   appversion: ${VERSION}
 EOF
