@@ -13,17 +13,29 @@ $ git clone https://github.com/mminichino/sampleapp-kubernetes
 $ cd sampleapp-kubernetes
 $ tridentctl -n trident create backend -f ontap-nas-trident-sample.json
 $ kubectl create -f storage-class-ontapnas.yaml
-$ kubectl create -f sampleapp-secrets.yaml
-$ kubectl apply -f <(istioctl kube-inject -f sampleapp-stack.yaml)
-$ kubectl create -f sampleapp-istio-gw.yaml
+$ kubectl create -f sampleapp-stack-ontapnas.yaml
 ```
 
 To run the sample app without Trident, rather with local storage:
 
+1) Install OpenEBS into your cluster
+2) Configure cStor and create a storage class called openebs-cstor
+
 ```
-$ kubectl create -f sampleapp-secrets.yaml
-$ kubectl apply -f <(istioctl kube-inject -f sampleapp-stack-local.yaml)
-$ kubectl create -f sampleapp-istio-gw.yaml
+$ git clone https://github.com/mminichino/sampleapp-kubernetes
+$ cd sampleapp-kubernetes
+$ kubectl create -f sampleapp-stack-openebs.yaml
+```
+
+To run the sample app with Helm:
+
+1) Make sure that Helm is setup on your cluster
+2) Make sure that you have a default Storage Class set
+
+```
+$ git clone https://github.com/mminichino/sampleapp-kubernetes
+$ cd sampleapp-kubernetes
+$ helm install ./sampleapp
 ```
 
 To access the app, use the Istio HTTP ingress gateway:

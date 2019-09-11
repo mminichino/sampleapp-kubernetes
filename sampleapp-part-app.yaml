@@ -15,8 +15,6 @@ spec:
        maxSurge: 1
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp
     spec:

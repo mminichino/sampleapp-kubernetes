@@ -15,25 +15,6 @@ data:
   mysqlRootPassword: TmV0QXBwMTIz
   mysqlDatabase: c2FtcGxlYXBw
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: sampleapp-redis-pv-volume
-  namespace: sampleapp
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 2Gi
-  accessModes:
-    - ReadWriteOnce
-  claimRef:
-    namespace: sampleapp
-    name: sampleapp-redis-pv-claim
-  hostPath:
-    path: "/mnt/redisdata"
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -45,7 +26,7 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  storageClassName: manual
+  storageClassName: openebs-cstor
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -60,8 +41,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp-redis
     spec:
@@ -125,8 +104,6 @@ spec:
        maxSurge: 1
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp
     spec:
@@ -217,25 +194,6 @@ spec:
         port:
           number: 8080
 ---
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: sampleapp-db-pv-volume
-  namespace: sampleapp
-  labels:
-    type: local
-spec:
-  storageClassName: manual
-  capacity:
-    storage: 2Gi
-  accessModes:
-    - ReadWriteOnce
-  claimRef:
-    namespace: sampleapp
-    name: sampleapp-db-pv-claim
-  hostPath:
-    path: "/mnt/sqldata"
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -247,7 +205,7 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  storageClassName: manual
+  storageClassName: openebs-cstor
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -262,8 +220,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp-db
     spec:

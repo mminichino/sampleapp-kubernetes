@@ -1,0 +1,63 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sampleapp-redis-pv-claim
+  namespace: sampleapp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: standard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sampleapp-redis
+  namespace: sampleapp
+spec:
+  selector:
+    matchLabels:
+      app: sampleapp-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sampleapp-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:5.0.5-alpine
+        ports:
+        - containerPort: 6379
+          name: client
+        - containerPort: 16379
+          name: gossip
+        volumeMounts:
+        - name: data
+          mountPath: /data
+          readOnly: false
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: sampleapp-redis-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-redis-service
+  namespace: sampleapp
+spec:
+  ports:
+  - port: 6379
+    protocol: TCP
+    targetPort: 6379
+    name: client
+  - port: 16379
+    protocol: TCP
+    targetPort: 16379
+    name: gossip
+  selector:
+    app: sampleapp-redis

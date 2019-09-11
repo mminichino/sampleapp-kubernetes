@@ -6,7 +6,7 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: sampleapp-secrets
+  name: sampleapp-{{ .Release.Name }}-secrets
   namespace: sampleapp
 type: Opaque
 data:
@@ -18,31 +18,30 @@ data:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: sampleapp-redis-pv-claim
+  name: sampleapp-{{ .Release.Name }}-redis-pv-claim
   namespace: sampleapp
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
-  storageClassName: ontapnas
+      storage: {{ .Values.redisVolumeSize }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sampleapp-redis
+  name: sampleapp-{{ .Release.Name }}-redis
   namespace: sampleapp
 spec:
   selector:
     matchLabels:
-      app: sampleapp-redis
+      app: sampleapp-{{ .Release.Name }}-redis
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: sampleapp-redis
+        app: sampleapp-{{ .Release.Name }}-redis
     spec:
       containers:
       - name: redis
@@ -59,12 +58,12 @@ spec:
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: sampleapp-redis-pv-claim
+          claimName: sampleapp-{{ .Release.Name }}-redis-pv-claim
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: sampleapp-redis-service
+  name: sampleapp-{{ .Release.Name }}-redis-service
   namespace: sampleapp
 spec:
   ports:
@@ -77,26 +76,26 @@ spec:
     targetPort: 16379
     name: gossip
   selector:
-    app: sampleapp-redis
+    app: sampleapp-{{ .Release.Name }}-redis
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sampleapp-config
+  name: sampleapp-{{ .Release.Name }}-config
   namespace: sampleapp
 data:
-  appversion: "2.5.28"
+  appversion: "{{.Chart.Version}}"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sampleapp
+  name: sampleapp-{{ .Release.Name }}
   namespace: sampleapp
 spec:
-  replicas: 4
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: sampleapp
+      app: sampleapp-{{ .Release.Name }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -105,35 +104,35 @@ spec:
   template:
     metadata:
       labels:
-        app: sampleapp
+        app: sampleapp-{{ .Release.Name }}
     spec:
       containers:
-      - name: sample-app
+      - name: sampleapp
         image: mminichino/sample-app:latest
         imagePullPolicy: Always
         command: ["node", "index.js"]
         ports:
         - name: nodejs-port
-          containerPort: 8080
+          containerPort: {{ .Values.nodePort }}
         env:
           - name: MYSQL_HOST
-            value: sampleapp-db-service
+            value: sampleapp-{{ .Release.Name }}-db-service
           - name: MYSQL_USER
             value: root
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: sampleapp-secrets
+                name: sampleapp-{{ .Release.Name }}-secrets
                 key: mysqlRootPassword
           - name: MYSQL_DATABASE
             valueFrom:
               secretKeyRef:
-                name: sampleapp-secrets
+                name: sampleapp-{{ .Release.Name }}-secrets
                 key: mysqlDatabase
           - name: APPVERSION
             valueFrom:
               configMapKeyRef:
-                name: sampleapp-config
+                name: sampleapp-{{ .Release.Name }}-config
                 key: appversion
           - name: POD_NAME
             valueFrom:
@@ -144,27 +143,27 @@ spec:
               fieldRef:
                 fieldPath: spec.nodeName
           - name: REDIS_HOST
-            value: sampleapp-redis-service
+            value: sampleapp-{{ .Release.Name }}-redis-service
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: sampleapp-service
+  name: sampleapp-{{ .Release.Name }}-service
   namespace: sampleapp
   labels:
-    app: sampleapp
+    app: sampleapp-{{ .Release.Name }}
 spec:
   selector:
-    app: sampleapp
+    app: sampleapp-{{ .Release.Name }}
   ports:
   - name: http
-    port: 8080
-    targetPort: 8080
+    port: {{ .Values.nodePort }}
+    targetPort: {{ .Values.nodePort }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: sampleapp-gateway
+  name: sampleapp-{{ .Release.Name }}-gateway
   namespace: sampleapp
 spec:
   selector:
@@ -180,48 +179,47 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: sampleapp
+  name: sampleapp-{{ .Release.Name }}
   namespace: sampleapp
 spec:
   hosts:
   - "*"
   gateways:
-  - sampleapp-gateway
+  - sampleapp-{{ .Release.Name }}-gateway
   http:
   - route:
     - destination:
-        host: sampleapp-service.sampleapp.svc.cluster.local
+        host: sampleapp-{{ .Release.Name }}-service.sampleapp.svc.cluster.local
         port:
-          number: 8080
+          number: {{ .Values.nodePort }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: sampleapp-db-pv-claim
+  name: sampleapp-{{ .Release.Name }}-db-pv-claim
   namespace: sampleapp
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
-  storageClassName: ontapnas
+      storage: {{ .Values.mysqlVolumeSize }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sampleapp-db
+  name: sampleapp-{{ .Release.Name }}-db
   namespace: sampleapp
 spec:
   selector:
     matchLabels:
-      app: sampleapp-db
+      app: sampleapp-{{ .Release.Name }}-db
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: sampleapp-db
+        app: sampleapp-{{ .Release.Name }}-db
     spec:
       containers:
       - name: mysql
@@ -230,39 +228,39 @@ spec:
         - name: mysql-port
           containerPort: 3306
         volumeMounts:
-        - name: sampleapp-persistent-storage
+        - name: sampleapp-{{ .Release.Name }}-persistent-storage
           mountPath: /var/lib/mysql
           subPath: mysql
         env:
           - name: MYSQL_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: sampleapp-secrets
+                name: sampleapp-{{ .Release.Name }}-secrets
                 key: mysqlRootPassword
           - name: MYSQL_USER
             valueFrom:
               secretKeyRef:
-                name: sampleapp-secrets
+                name: sampleapp-{{ .Release.Name }}-secrets
                 key: mysqlUser
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: sampleapp-secrets
+                name: sampleapp-{{ .Release.Name }}-secrets
                 key: mysqlPassword
           - name: MYSQL_DATABASE
             valueFrom:
               secretKeyRef:
-                name: sampleapp-secrets
+                name: sampleapp-{{ .Release.Name }}-secrets
                 key: mysqlDatabase
       volumes:
-      - name: sampleapp-persistent-storage
+      - name: sampleapp-{{ .Release.Name }}-persistent-storage
         persistentVolumeClaim:
-          claimName: sampleapp-db-pv-claim
+          claimName: sampleapp-{{ .Release.Name }}-db-pv-claim
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: sampleapp-db-service
+  name: sampleapp-{{ .Release.Name }}-db-service
   namespace: sampleapp
 spec:
   ports:
@@ -270,4 +268,4 @@ spec:
     protocol: TCP
     targetPort: 3306
   selector:
-    app: sampleapp-db
+    app: sampleapp-{{ .Release.Name }}-db

@@ -1,0 +1,28 @@
+apiVersion: openebs.io/v1alpha1
+kind: StoragePoolClaim
+metadata:
+  name: cstor-disk-pool
+  annotations:
+    cas.openebs.io/config: |
+      - name: PoolResourceRequests
+        value: |-
+            memory: 0.5Gi
+      - name: PoolResourceLimits
+        value: |-
+            memory: 2Gi
+spec:
+  name: cstor-disk-pool
+  type: disk
+  poolSpec:
+    poolType: raidz
+  blockDevices:
+    blockDeviceList:
+    - blockdevice-192acdd000a6a4faecc0515893a0f381
+    - blockdevice-1e6263dd6004fbc5f03ab1b529cceb32
+    - blockdevice-1e8097238440a67e83fbb81afbaec506
+    - blockdevice-3e53c2b1c74838d1d2538e0dcb3d29bf
+    - blockdevice-4da040f9ab9f2edf76b0d553b2809049
+    - blockdevice-5893f26d11c58bcd1497679a895fcbc0
+    - blockdevice-840f4860091e0ffe9b46b0ee6985d334
+    - blockdevice-b634fbe86a99b344cd85d21c4c0875c5
+    - blockdevice-ee78e6562eff2f51d3393a0487497ee8

@@ -41,8 +41,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp-redis
     spec:
@@ -106,8 +104,6 @@ spec:
        maxSurge: 1
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp
     spec:
@@ -224,8 +220,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "false"
       labels:
         app: sampleapp-db
     spec:
