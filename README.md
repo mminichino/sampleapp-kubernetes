@@ -20,6 +20,7 @@ To run the sample app without Trident, rather with local storage:
 
 1) Install OpenEBS into your cluster
 2) Configure cStor and create a storage class called openebs-cstor
+3) See example YAML files in the examples directory
 
 ```
 $ git clone https://github.com/mminichino/sampleapp-kubernetes
