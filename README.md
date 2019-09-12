@@ -40,6 +40,13 @@ $ cd sampleapp-kubernetes
 $ helm install ./sampleapp
 ```
 
+To create a namespace with Istio sidecar injection enabled:
+
+```
+$ kubectl create namespace sampledemo
+$ kubectl label namespace sampledemo istio-injection=enabled
+```
+
 To access the app, use the Istio HTTP ingress gateway:
 
 ```

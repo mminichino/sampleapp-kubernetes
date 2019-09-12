@@ -18,7 +18,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"method\":\"GetVisitorCount\",\n\t\"id\":1\n}"
+					"raw": "{\n\t\"method\":\"GetVisitorCount\",\n\t\"id\":1,\n\t\"token\": \"abcdef\"\n}"
 				},
 				"url": {
 					"raw": "http://{{Hostname}}/v1/visitors/count",
@@ -48,7 +48,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"method\":\"GetVisitorList\",\n\t\"order\":\"ascending\",\n\t\"between\":\"\",\n\t\"id\":1\n}"
+					"raw": "{\n\t\"method\":\"GetVisitorList\",\n\t\"order\":\"ascending\",\n\t\"between\":\"\",\n\t\"id\":1,\n\t\"token\": \"abcdef\"\n}"
 				},
 				"url": {
 					"raw": "http://{{Hostname}}/v1/visitors/list",
@@ -60,6 +60,35 @@
 						"v1",
 						"visitors",
 						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authorization",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"admin\",\n\t\"password\": \"password\"\n}"
+				},
+				"url": {
+					"raw": "http://{{Hostname}}/v1/authorize",
+					"protocol": "http",
+					"host": [
+						"{{Hostname}}"
+					],
+					"path": [
+						"v1",
+						"authorize"
 					]
 				}
 			},
@@ -90,7 +119,7 @@
 	],
 	"variable": [
 		{
-			"id": "6bdc3649-2803-4571-877f-d815362b5017",
+			"id": "2680503b-602b-4137-8854-8643d7c0b905",
 			"key": "Hostname",
 			"value": "127.0.0.1:8080",
 			"type": "string"
