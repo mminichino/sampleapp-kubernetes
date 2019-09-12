@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: sampleapp
+  name: sampleapp-{{ .Release.Name }}
   labels:
     istio-injection: enabled
 ---
@@ -9,7 +9,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: sampleapp-{{ .Release.Name }}-secrets
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 type: Opaque
 data:
   mysqlUser: c2FtcGxlYXBw
@@ -21,7 +21,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: sampleapp-{{ .Release.Name }}-redis-pv-claim
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   accessModes:
     - ReadWriteOnce
@@ -33,7 +33,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sampleapp-{{ .Release.Name }}-redis
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   selector:
     matchLabels:
@@ -66,7 +66,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sampleapp-{{ .Release.Name }}-redis-service
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   ports:
   - port: 6379
@@ -84,7 +84,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sampleapp-{{ .Release.Name }}-config
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 data:
   appversion: "{{.Chart.Version}}"
 ---
@@ -92,7 +92,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sampleapp-{{ .Release.Name }}
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -151,7 +151,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sampleapp-{{ .Release.Name }}-service
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
   labels:
     app: sampleapp-{{ .Release.Name }}
 spec:
@@ -166,13 +166,13 @@ apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: sampleapp-{{ .Release.Name }}-gateway
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   selector:
     istio: ingressgateway
   servers:
   - port:
-      number: 80
+      number: {{ .Values.externalPort }}
       name: http
       protocol: HTTP
     hosts:
@@ -182,7 +182,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: sampleapp-{{ .Release.Name }}
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   hosts:
   - "*"
@@ -199,7 +199,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: sampleapp-{{ .Release.Name }}-db-pv-claim
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   accessModes:
     - ReadWriteOnce
@@ -211,7 +211,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sampleapp-{{ .Release.Name }}-db
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   selector:
     matchLabels:
@@ -263,7 +263,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sampleapp-{{ .Release.Name }}-db-service
-  namespace: sampleapp
+  namespace: sampleapp-{{ .Release.Name }}
 spec:
   ports:
   - port: 3306

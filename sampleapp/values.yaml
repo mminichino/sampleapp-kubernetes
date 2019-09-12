@@ -4,5 +4,6 @@
 
 replicaCount: 4
 nodePort: 8080
+externalPort: 80
 mysqlVolumeSize: 2Gi
 redisVolumeSize: 2Gi
