@@ -32,6 +32,7 @@ To run the sample app with Helm:
 
 1) Make sure that Helm is setup on your cluster
 2) Make sure that you have a default Storage Class set
+3) Make sure the namespace you use has Istio sidecar injection enabled
 
 ```
 $ git clone https://github.com/mminichino/sampleapp-kubernetes
