@@ -40,6 +40,22 @@ $ cd sampleapp-kubernetes
 $ helm install ./sampleapp
 ```
 
+To use the REST API to access the SampleApp:
+
+```
+$ git clone https://github.com/mminichino/sampleapp-kubernetes
+$ cd sampleapp-kubernetes
+$ bin/getSampleAppVisitors.sh -l -h x.y.x.z -p 31380
+Username: admin
+Password: 
+Login successful.
+Exported token.  Please rerun to query data.
+$ bin/getSampleAppVisitors.sh
+Reading cached credentials from /home/user/.demo/demo.token
+1,1,10.32.0.1,Safari,12.1.2,Desktop,macOS Mojave,sampleapp-billowing-mule-5b7847db47-khfzh,1568244060210
+2,2,10.32.0.1,Safari,12.1.2,Desktop,macOS Mojave,sampleapp-billowing-mule-5b7847db47-rdp9h,1568244067887
+```
+
 To create a namespace with Istio sidecar injection enabled:
 
 ```
