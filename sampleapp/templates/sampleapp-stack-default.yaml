@@ -74,7 +74,7 @@ kind: ConfigMap
 metadata:
   name: sampleapp-{{ .Release.Name }}-config
 data:
-  appversion: "{{.Chart.Version}}"
+  appversion: {{ if .Values.applicationVersion }}{{ quote .Values.applicationVersion }}{{ else }}{{ quote .Chart.Version }}{{ end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -148,6 +148,7 @@ spec:
     port: {{ .Values.nodePort }}
     targetPort: {{ .Values.nodePort }}
 ---
+{{ if .Values.useIstio }}
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -179,6 +180,26 @@ spec:
         port:
           number: {{ .Values.nodePort }}
 ---
+{{ else }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-{{ .Release.Name }}-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: sampleapp-{{ .Release.Name }}
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ .Values.externalPort }}
+    targetPort: {{ .Values.nodePort }}
+{{- if .Values.externalIP }}
+  externalIPs:
+  - {{ .Values.externalIP }}
+{{- end }}
+---
+{{ end }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:

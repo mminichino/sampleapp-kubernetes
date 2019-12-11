@@ -7,3 +7,13 @@ nodePort: 8080
 externalPort: 80
 mysqlVolumeSize: 2Gi
 redisVolumeSize: 2Gi
+
+## Override application version to demo application updates
+# applicationVersion: 1
+
+## Set an external IP when Istio is not in use and there isn't
+## a defined LB with an external IP
+# externalIP: w.x.y.z
+
+## Enable or disable the use of Istio sidecar
+useIstio: true
