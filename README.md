@@ -1,12 +1,24 @@
 # sampleapp-kubernetes
 Kubernetes YAML for the Sample App
 
+To use the Sample App with Astra:
+
+1) Deploy kubernetes cluster
+2) Add cluster compute to Astra
+3) Manage your apps
+
+```
+$ git clone https://github.com/mminichino/sampleapp-kubernetes
+$ cd sampleapp-kubernetes
+$ kubectl create -f sampleapp-stack-gke-astra.yaml
+```
+
 To create the sample app with ONTAP NAS storage via Trident:
 
-1) Install kubectl and istioctl (if necessary)
+1) Install kubernetes cluster and kubectl
 2) Install Trident per documentation in namespace trident
 3) Edit JSON as appropriate for target ONTAP system
-4) Add Trident and Istio bin directories to PATH
+4) Add Trident directory to PATH
 
 ```
 $ git clone https://github.com/mminichino/sampleapp-kubernetes

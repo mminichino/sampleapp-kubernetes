@@ -1,0 +1,255 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sampleapp
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sampleapp-secrets
+  namespace: sampleapp
+type: Opaque
+data:
+  mysqlUser: c2FtcGxlYXBw
+  mysqlPassword: TmV0QXBwMTIz
+  mysqlRootPassword: TmV0QXBwMTIz
+  mysqlDatabase: c2FtcGxlYXBw
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sampleapp-redis-pv-claim
+  namespace: sampleapp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: netapp-cvs-standard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sampleapp-redis
+  namespace: sampleapp
+spec:
+  selector:
+    matchLabels:
+      app: sampleapp-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sampleapp-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:5.0.12-alpine
+        ports:
+        - containerPort: 6379
+          name: client
+        - containerPort: 16379
+          name: gossip
+        volumeMounts:
+        - name: data
+          mountPath: /data
+          readOnly: false
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: sampleapp-redis-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-redis-service
+  namespace: sampleapp
+spec:
+  ports:
+  - port: 6379
+    protocol: TCP
+    targetPort: 6379
+    name: client
+  - port: 16379
+    protocol: TCP
+    targetPort: 16379
+    name: gossip
+  selector:
+    app: sampleapp-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sampleapp
+  namespace: sampleapp
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: sampleapp
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+       maxUnavailable: 25%
+       maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: sampleapp
+    spec:
+      containers:
+      - name: sample-app
+        image: mminichino/sample-app:latest
+        imagePullPolicy: Always
+        command: ["node", "index.js"]
+        ports:
+        - name: nodejs-port
+          containerPort: 8080
+        env:
+          - name: MYSQL_HOST
+            value: sampleapp-db-service
+          - name: MYSQL_USER
+            value: root
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlRootPassword
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlDatabase
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: REDIS_HOST
+            value: sampleapp-redis-service
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: sampleapp-health-check
+  namespace: sampleapp
+spec:
+  healthCheck:
+    checkIntervalSec: 15
+    port: 8080
+    type: HTTP
+    requestPath: /healthz
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-service
+  namespace: sampleapp
+  labels:
+    app: sampleapp
+  annotations:
+    cloud.google.com/backend-config: '{"default": "sampleapp-health-check"}'
+spec:
+  selector:
+    app: sampleapp
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: sampleapp-ingress
+  namespace: sampleapp
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: sampleapp-service
+          servicePort: 8080
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: sampleapp-db-pv-claim
+  namespace: sampleapp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: netapp-cvs-standard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sampleapp-db
+  namespace: sampleapp
+spec:
+  selector:
+    matchLabels:
+      app: sampleapp-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sampleapp-db
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7.33
+        ports:
+        - name: mysql-port
+          containerPort: 3306
+        volumeMounts:
+        - name: sampleapp-persistent-storage
+          mountPath: /var/lib/mysql
+          subPath: mysql
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlRootPassword
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlUser
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlPassword
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: sampleapp-secrets
+                key: mysqlDatabase
+      volumes:
+      - name: sampleapp-persistent-storage
+        persistentVolumeClaim:
+          claimName: sampleapp-db-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampleapp-db-service
+  namespace: sampleapp
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: sampleapp-db
