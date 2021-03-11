@@ -1,0 +1,25 @@
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: sampleapp-health-check
+  namespace: sampleapp-dev1
+spec:
+  healthCheck:
+    checkIntervalSec: 15
+    port: 8080
+    type: HTTP
+    requestPath: /healthz
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: sampleapp-ingress
+  namespace: sampleapp-dev1
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: sampleapp-service
+          servicePort: 8080
